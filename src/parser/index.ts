@@ -7,8 +7,10 @@ import {
   UnaryOperation,
   Node,
   Var,
-  Assignation
+  Assignation,
+  Compound
 } from "./node";
+import { RESERVED_WORDS } from "../enums/RESERVED_WORDS";
 
 /** 
 expr   : term ((PLUS | MINUS) term)*
@@ -26,6 +28,9 @@ export default class Parser {
   processToken(type: TFACTOR): Token | never {
     console.log(this.currentToken, type);
     if (this.currentToken.type !== type) {
+      if (type === FACTORS.END_LINE) {
+        throw new Error(`missing ${FACTORS.END_LINE}`);
+      }
       throw new Error(`Error parsing, wrong type ${type}`);
     }
     this.currentToken = this.lexer.getNextToken();
@@ -33,7 +38,43 @@ export default class Parser {
   }
 
   program(): Node {
-    return this.assignmentStatement();
+    this.processToken(FACTORS.BEGIN);
+    const node = this.statementList();
+    // this.processToken(FACTORS.END);
+    return node;
+  }
+
+  statementList(): Node {
+    const node = this.statement();
+    const compoundList = new Compound();
+    compoundList.appendNode(node);
+
+    const { currentToken } = this;
+
+    while (currentToken.type === FACTORS.END_LINE) {
+      this.processToken(FACTORS.END_LINE);
+
+      if (
+        this.currentToken.type === FACTORS.END ||
+        this.currentToken.type === FACTORS.EOF
+      ) {
+        break;
+      }
+      const newNode = this.statement();
+      compoundList.appendNode(newNode);
+    }
+
+    if (currentToken.type === FACTORS.ID) {
+      throw new Error(
+        `Error parsing statement ${currentToken.type} ${currentToken.value}`
+      );
+    }
+    return compoundList;
+  }
+
+  statement(): Node {
+    const assignmentStatement = this.assignmentStatement();
+    return assignmentStatement;
   }
 
   assignmentStatement(): Node {
@@ -41,6 +82,7 @@ export default class Parser {
     const token = this.currentToken;
     this.processToken(FACTORS.ASSIGN);
     const right = this.expr();
+    // this.processToken(FACTORS.END_LINE);
     return new Assignation(left, right, token);
   }
 

@@ -8,6 +8,12 @@ export class Compound extends AbstractTreeSyntax {
     super();
     this.children = [];
   }
+  public appendNode(node: Node) {
+    this.children.push(node);
+  }
+  verbose() {
+    return this.children.map(c => c.verbose());
+  }
 }
 
 export class Assignation extends AbstractTreeSyntax {
@@ -87,4 +93,10 @@ export class BinaryOperation {
   }
 }
 
-export type Node = Num | BinaryOperation | UnaryOperation | Var | Assignation;
+export type Node =
+  | Num
+  | BinaryOperation
+  | UnaryOperation
+  | Var
+  | Assignation
+  | Compound;
