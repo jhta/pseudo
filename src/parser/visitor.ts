@@ -5,7 +5,8 @@ import {
   BinaryOperation,
   UnaryOperation,
   Assignation,
-  Compound
+  Compound,
+  Var
 } from "./node";
 
 declare global {
@@ -38,6 +39,10 @@ export default class Visitor {
 
     if (node instanceof Assignation) {
       return this.visitAssignation(node as Assignation);
+    }
+
+    if (node instanceof Var) {
+      return this.visitVar(node as Var);
     }
 
     throw new Error(`cannot visit node type ${name}`);
@@ -88,7 +93,17 @@ export default class Visitor {
     );
   }
 
-  visitNum(node: Num) {
+  visitNum(node: Num): number {
     return Number(node.value);
+  }
+
+  visitVar(node: Var) {
+    const { value: varName } = node;
+    const val = window.GLOBAL_SCOPE.get(varName);
+
+    if (!val) {
+      throw new Error(`var ${varName} was not found`);
+    }
+    return val;
   }
 }

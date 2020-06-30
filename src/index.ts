@@ -13,8 +13,7 @@ const str2 = `
 INICIO
   abc = -7 + 3 * (10 / (12 / (3 + 1) - 1));
   xyz = 1 + 2 + 3;
-  w =  5 * 4;
-  dfsd
+  w =  5 * 4 + xyz;
 FINAL
 `;
 
