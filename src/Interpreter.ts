@@ -8,6 +8,7 @@ export default class Interpreter {
     const parser = new Parser(lexer);
 
     const abstractTree = parser.parse();
+
     return new Visitor().visit(abstractTree);
   }
 }

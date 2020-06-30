@@ -1,5 +1,21 @@
 import { FACTORS } from "../enums";
-import { Node, Num, BinaryOperation, UnaryOperation } from "./node";
+import {
+  Node,
+  Num,
+  BinaryOperation,
+  UnaryOperation,
+  Assignation,
+  Compound
+} from "./node";
+
+declare global {
+  interface Window {
+    GLOBAL_SCOPE: Map<string, any>;
+  }
+}
+
+const GLOBAL_SCOPE = new Map();
+window.GLOBAL_SCOPE = GLOBAL_SCOPE;
 
 export default class Visitor {
   visit(node: Node): any {
@@ -14,6 +30,14 @@ export default class Visitor {
 
     if (node instanceof UnaryOperation) {
       return this.visitorUnaryOperator(node as UnaryOperation);
+    }
+
+    if (node instanceof Compound) {
+      return this.visitCompound(node as Compound);
+    }
+
+    if (node instanceof Assignation) {
+      return this.visitAssignation(node as Assignation);
     }
 
     throw new Error(`cannot visit node type ${name}`);
@@ -34,6 +58,19 @@ export default class Visitor {
     throw new Error(
       `${operation.type} doesn't has any visitor operator asigned`
     );
+  }
+
+  visitAssignation(node: Assignation): void {
+    const { left, right } = node;
+    const name = left.value;
+    const value = this.visit(right);
+    window.GLOBAL_SCOPE.set(name, value);
+    return name;
+  }
+
+  visitCompound(node: Compound): any {
+    const visitedNodes = node.children.map(childNode => this.visit(childNode));
+    return visitedNodes.filter(n => n);
   }
 
   visitorUnaryOperator(node: UnaryOperation): any {

@@ -5,7 +5,7 @@ import Lexer from "./Lexer";
 import Parser from "./parser";
 import createDOMSyntaxTree from "./create-dom-ast";
 
-// import Interpreter from "./Interpreter";
+import Interpreter from "./Interpreter";
 
 const str = "var = -7 + 3 * (10 / (12 / (3 + 1) - 1))";
 const str2 = `
@@ -48,8 +48,8 @@ console.log("tree", tree);
 // const v = new Visitor();
 // console.log(v.visit(tr));
 
-// const int = new Interpreter();
-// console.log("interpreted:", int.interpret(str));
+const int = new Interpreter();
+console.log("interpreted:", int.interpret(str2));
 // console.log(int);
 
 document.getElementById("app").innerHTML = `
