@@ -11,6 +11,7 @@ import {
   Compound
 } from "./node";
 import { RESERVED_WORDS } from "../enums/RESERVED_WORDS";
+import { MATH_FACTOR } from "../enums/MATH_SYMBOLS";
 
 /** 
 expr   : term ((PLUS | MINUS) term)*
@@ -80,7 +81,13 @@ export default class Parser {
   assignmentStatement(): Node {
     const left = this.variable();
     const token = this.currentToken;
-    this.processToken(FACTORS.ASSIGN);
+    try {
+      this.processToken(FACTORS.ASSIGN);
+    } catch (e) {
+      throw new Error(
+        `the var "${left.verbose()}" needs to have an assignation`
+      );
+    }
     const right = this.expr();
     // this.processToken(FACTORS.END_LINE);
     return new Assignation(left, right, token);
